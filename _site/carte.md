@@ -12,7 +12,7 @@ The real value of **Carte** is its structure for describing APIs, not its underl
 
 ## Install
 
-It' Jekyll god dammit:
+It's Jekyll god dammit:
 
 1. Clone this repository on your local,
 1. [Install Jekyll](https://github.com/mojombo/jekyll/wiki/install),

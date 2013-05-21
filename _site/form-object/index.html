@@ -1,0 +1,180 @@
+<p>The API exposes a representation of the forms in JSON.</p>
+
+<p>EXAMPLE FORM RESPONSE</p>
+
+<p><code>{
+    &quot;forms&quot;: [
+        {
+            &quot;name&quot;: &quot;form name&quot;,
+            &quot;formID&quot;: &quot;form_name&quot;,
+            &quot;version&quot;: &quot;&quot;,
+            &quot;hash&quot;: &quot;md5:b62285b40b24bf089a4f81e6b47ca323&quot;,
+            &quot;downloadUrl&quot;: &quot;https://formhub.org/user/forms/form_name/form.xml&quot;,
+            &quot;manifestUrl&quot;: &quot;https: //formhub.org/user/forms/form_name&quot;
+        }
+    ]
+</code>}</p>
+
+<p>xls = models.FileField(upload_to=upload_to, null=True) json = models.TextField(default=u&#8221;) description = models.TextField(default=u&#8221;, null=True) xml = models.TextField()</p>
+
+<pre><code>user = models.ForeignKey(User, related_name=&#39;xforms&#39;, null=True)
+shared = models.BooleanField(default=False)
+shared_data = models.BooleanField(default=False)
+downloadable = models.BooleanField(default=True)
+is_crowd_form = models.BooleanField(default=False)
+allows_sms = models.BooleanField(default=False)
+encrypted = models.BooleanField(default=False)
+
+# the following fields are filled in automatically
+sms_id_string = models.SlugField(
+    editable=False,
+    verbose_name=ugettext_lazy(&quot;SMS ID&quot;),
+    default=&#39;&#39;
+)
+id_string = models.SlugField(
+    editable=False, verbose_name=ugettext_lazy(&quot;ID&quot;)
+)
+title = models.CharField(editable=False, max_length=64)
+date_created = models.DateTimeField(auto_now_add=True)
+date_modified = models.DateTimeField(auto_now=True)
+has_start_time = models.BooleanField(default=False)
+uuid = models.CharField(max_length=32, default=u&#39;&#39;)
+
+uuid_regex = re.compile(r&#39;(&lt;instance&gt;.*?id=&quot;[^&quot;]+&quot;&gt;)(.*&lt;/instance&gt;)(.*)&#39;,
+                        re.DOTALL)
+instance_id_regex = re.compile(r&#39;&lt;instance&gt;.*?id=&quot;([^&quot;]+)&quot;.*&lt;/instance&gt;&#39;,
+                               re.DOTALL)
+uuid_node_location = 2
+uuid_bind_location = 4
+bamboo_dataset = models.CharField(max_length=60, default=u&#39;&#39;)</code></pre>
+
+<h3 id='core_properties'>Core Properties</h3>
+
+<p>Each facility has the following core properties:</p>
+
+<ul>
+<li><code>name</code> - Name of the form</li>
+</ul>
+
+<p><code>&quot;name&quot;: &quot;Kakamega HC&quot;</code></p>
+
+<ul>
+<li><code>uuid</code> - globally unique <a href='http://en.wikipedia.org/wiki/Universally_unique_identifier'>UUID per RFC 4122</a>. The UUID for a facility should remain constant and should never be changed. eg) the URL of the facility changes.</li>
+</ul>
+
+<p><code>&quot;uuid&quot;: &quot;50e8400-e29b-41d4-a716-446655440000&quot;</code></p>
+
+<ul>
+<li><code>href</code> - URL link to the unique ID API resource for the facility. The url of a facility MAY be structured around the uuid, a system-specific identifier or some other scheme. Clients of the facilities registry MUST use the provided url field and not attempt to calculate the URL themselves from other fields the facility has.</li>
+</ul>
+
+<p>Using the same HREF should always return the same facility (if it still exists).</p>
+
+<p><code>&quot;href&quot;: &quot;http://facilityregistry.org/api/v1/facilities/53adf.json&quot;</code></p>
+
+<p>FACILITY IDENTIFIERS</p>
+
+<p>One of the primary functions of the facility registry is to facilitate a mapping of the different IDs used by different agencies to represent a particular facility.</p>
+
+<p>Each external identifier consists of the following components:</p>
+
+<p>agency: agency who created the code. ex) ministry of health, UNICEF, etc. context: context/external system in which the agency is using the ID. eg) HMIS, DHIS2, HR id: unique identifier</p>
+
+<p><code>&quot;identifiers&quot;: [
+      {&quot;agency&quot;: &quot;MOH&quot;, &quot;context&quot;: &quot;DHIS&quot;, &quot;id&quot;: &quot;123&quot;},
+      {&quot;agency&quot;: &quot;UNICEF&quot;, &quot;context&quot;: &quot;mtrac&quot;, &quot;id&quot;: &quot;53adf&quot;},
+      { .... }
+]</code></p>
+
+<ul>
+<li><code>coordinates</code> - Geolocation represented by longitude and latitude coordinates in that order. All coordinates assume as WSG84 projection.</li>
+</ul>
+
+<p><code>&quot;coordinates&quot;: [lng, lat]</code></p>
+
+<ul>
+<li><code>active</code> - indicates whether the facility is active or not.</li>
+</ul>
+
+<p><code>&quot;active&quot;: {true/false}</code></p>
+
+<ul>
+<li><code>createdAt</code> - ISO 8601 timestamp of when the facility was created in the registry.</li>
+</ul>
+
+<p><code>&quot;createdAt&quot;: &quot;2011-11-16T14:26:15Z&quot;</code></p>
+
+<ul>
+<li><code>updatedAt</code> - ISO 8601 timestamp of when the facility was last updated in the registry.</li>
+</ul>
+
+<p><code>&quot;updatedAt&quot;: &quot;2011-11-18T16:26:15Z&quot;</code></p>
+
+<h3 id='extended_properties'>Extended Properties</h3>
+
+<p>Extended properties are implementation specific properties in the properties block.</p>
+
+<p>The property types that are supported are:</p>
+
+<ul>
+<li>
+<p>String – A series of textual characters</p>
+</li>
+
+<li>
+<p>Integer – A whole number</p>
+</li>
+
+<li>
+<p>Decimal</p>
+</li>
+
+<li>
+<p>Boolean – A true or false value</p>
+</li>
+
+<li>
+<p>Date: ISO 8601 format. eg) 2012-12-16T18:22:20Z</p>
+</li>
+
+<li>
+<p>Lists - A list of one of the following data types</p>
+
+<ul>
+<li>Simple data types such as the code mnemonic of selected value(s) (example: “apple”,”orange”)</li>
+
+<li>Implementation specific complex data</li>
+</ul>
+</li>
+</ul>
+
+<p>SAMPLE PROPERTIES</p>
+
+<p><code>&quot;properties&quot;: {
+    &quot;numBeds&quot;: 55,
+    &quot;services&quot;: [&quot;XR&quot;,&quot;OBG&quot;,&quot;TR&quot;],
+    &quot;equipment&quot;: [
+        {
+            &quot;id&quot;: 542,
+            &quot;name&quot;: &quot;Microscope&quot;
+        },
+        {
+            &quot;id&quot;: 942,
+            &quot;name&quot;: &quot;Vaccine Fridge&quot;
+        }
+    ],
+    &quot;manager&quot;: &quot;Mrs. Liz&quot;
+    &quot;hasMaternity&quot;: true,
+},</code></p>
+
+<p>Property field specification expectations</p>
+
+<ul>
+<li>For each property field, the implementer specifies a stable code that should not be changed once defined. The implementation should warn the user if they attempt to modify the code.</li>
+
+<li>The property field code should consist only of letters and numbers and not any special characters, spaces or punctuation to allow them to represent a good xml element. The API does not specify whether to define properties using camelCasing or lower_case, however, we encourage the implementation to be consistent in their formating.</li>
+
+<li>Each property field should be unique</li>
+
+<li>Specific properties for attachments and images are not supported in this version. It is possible to use a text string to represent a file path but that is implementation specific</li>
+</ul>
